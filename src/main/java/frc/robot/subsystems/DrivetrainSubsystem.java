@@ -49,6 +49,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     private final SwerveDriveOdometry odometry;
 
+    public static Boolean isInput;
+
     public DrivetrainSubsystem() {
         ShuffleboardTab shuffleboardTab = Shuffleboard.getTab("Drivetrain");
 
@@ -111,6 +113,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void zeroGyroscope() {
+        gyroscope.reset();
         odometry.resetPosition(
                 gyroscope.getRotation2d(), modulePositions,
                 odometry.getPoseMeters()
@@ -123,6 +126,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void drive(ChassisSpeeds chassisSpeeds) {
         this.chassisSpeeds = chassisSpeeds;
+        isInput = true;
     }
 
     @Override

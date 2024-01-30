@@ -47,9 +47,6 @@ allprojects {
 
         // CTRE
         maven { url = uri('https://devsite.ctr-electronics.com/maven/release/') }
-
-        // REV
-        maven { url = uri('https://maven.revrobotics.com/') }
     }
 }
 

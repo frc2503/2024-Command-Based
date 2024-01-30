@@ -28,10 +28,10 @@ public class RobotContainer {
                 drivetrain,
                 () -> -modifyAxis(controller.getLeftY()), // Axes are flipped here on purpose
                 () -> -modifyAxis(controller.getLeftX()),
-                () -> -modifyAxis(controller.getRightX())
+                () -> modifyAxis(controller.getRightX())
         ));
 
-        new Trigger(controller::getBackButtonPressed).onTrue(new RunCommand(drivetrain::zeroGyroscope));
+        new Trigger(controller::getAButton).onTrue(new RunCommand(drivetrain::zeroGyroscope));
     }
 
     public DrivetrainSubsystem getDrivetrain() {

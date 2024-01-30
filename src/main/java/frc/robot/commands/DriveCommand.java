@@ -33,14 +33,19 @@ public class DriveCommand extends Command {
         double translationYPercent = translationYSupplier.getAsDouble();
         double rotationPercent = rotationSupplier.getAsDouble();
 
-        drivetrain.drive(
+        if(translationXPercent == 0 && translationYPercent == 0 && rotationPercent == 0){
+            DrivetrainSubsystem.isInput = false;
+            drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, drivetrain.getRotation()));
+        }else{
+            drivetrain.drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translationXPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-                        translationYPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+                        -translationXPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+                        -translationYPercent * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
                         rotationPercent * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND,
                         drivetrain.getRotation()
                 )
         );
+        }
     }
 
     @Override

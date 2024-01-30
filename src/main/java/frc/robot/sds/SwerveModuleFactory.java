@@ -2,6 +2,7 @@ package frc.robot.sds;
 
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
     private final ModuleConfiguration moduleConfiguration;
@@ -88,7 +89,10 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
             }
 
             driveController.setReferenceVoltage(driveVoltage);
-            steerController.setReferenceAngle(steerAngle);
+
+            if(DrivetrainSubsystem.isInput = true){
+                steerController.setReferenceAngle(steerAngle);
+            }
         }
 
         @Override
