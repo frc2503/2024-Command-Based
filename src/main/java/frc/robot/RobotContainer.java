@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -31,7 +32,7 @@ public class RobotContainer {
                 () -> modifyAxis(controller.getRightX())
         ));
 
-        new Trigger(controller::getAButton).onTrue(new RunCommand(drivetrain::zeroGyroscope));
+        new Trigger(controller::getAButton).onTrue(Commands.runOnce(() -> drivetrain.zeroGyroscope(), drivetrain));
     }
 
     public DrivetrainSubsystem getDrivetrain() {
