@@ -28,8 +28,6 @@ public final class Constants {
      */
     public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(24); // FIXME Measure and set wheelbase
 
-    public static final int DRIVETRAIN_PIGEON_ID = 60; // FIXME Set Pigeon ID
-
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 1; // FIXME Set front left module drive motor ID
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 6; // FIXME Set front left module steer motor ID
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 9; // FIXME Set front left steer encoder ID
