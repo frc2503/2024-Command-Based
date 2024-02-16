@@ -1,13 +1,15 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimberSubsystem;
 
 public class ClimberCommand extends Command{
     private final ClimberSubsystem climber;
-    private Double climberSpeed;
+    private DoubleSupplier climberSpeed;
 
-    public ClimberCommand(ClimberSubsystem climber, double climberSpeed){
+    public ClimberCommand(ClimberSubsystem climber, DoubleSupplier climberSpeed){
         this.climber = climber;
         this.climberSpeed = climberSpeed;
 
@@ -17,7 +19,7 @@ public class ClimberCommand extends Command{
     @Override
     public void execute(){
 
-        climber.setSpeed(climberSpeed);
+        climber.setSpeed(climberSpeed.getAsDouble());
 
     }
     

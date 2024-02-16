@@ -13,34 +13,40 @@ public class ClimberSubsystem extends SubsystemBase{
     private final RelativeEncoder encoder;
     private double encoderPosition;
     private final double speedMod = .5;
+    private double speed = 0.0;
 
     public ClimberSubsystem(){
         climber = new CANSparkMax(Constants.CLIMBER, MotorType.kBrushless);
         encoder = climber.getEncoder();
         encoder.setPositionConversionFactor(.00079331);
+        encoder.setPosition(0);
     }
 
     @Override
     public void periodic(){
-        encoderPosition = encoder.getPosition();
+        // if(speed > 0 && encoderPosition < Units.inchesToMeters(15.075)){
+        //     climberOut(speed);
+        // }else if(speed < 0 && encoderPosition > 0){
+        //     climberIn(speed);
+        // }else{
+        //     climber.set(0);
+        // }
+        System.out.println("Speed = " + speed);
+        System.out.println("Encoder = " + encoderPosition);
+        climber.set(speed);
+        encoderPosition = -encoder.getPosition();
     }
 
     private void climberOut(double speed){
-        climber.set(speed*speedMod);
+        climber.set(speed);
     }
 
     private void climberIn(double speed){
-        climber.set(speed*speedMod);
+        climber.set(speed);
     }
 
     public void setSpeed(double speed){
-        if(speed > 0 && encoderPosition < Units.inchesToMeters(15.075)){
-            climberOut(speed);
-        }else if(speed < 0 && encoderPosition > 0){
-            climberIn(speed);
-        }else{
-            climber.set(0);
-        }
+        this.speed = speed;
     }
 
 }

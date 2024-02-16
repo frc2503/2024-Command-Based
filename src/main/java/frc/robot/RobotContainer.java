@@ -42,7 +42,7 @@ public class RobotContainer {
                 () -> modifyAxis(driveController.getRightX())
         ));
 
-        climber.setDefaultCommand(new ClimberCommand(climber, modifyAxis(mechController.getLeftY())));
+        climber.setDefaultCommand(new ClimberCommand(climber, () -> modifyAxis(mechController.getLeftY())));
 
         new Trigger(driveController::getAButton).onTrue(Commands.runOnce(() -> drivetrain.zeroGyroscope(), drivetrain));
 
