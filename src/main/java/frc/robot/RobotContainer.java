@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.EndEffectorSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -19,20 +22,38 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  private final EndEffectorSubsystem endEffector = new EndEffectorSubsystem();
+  private final ClimberSubsystem climber = new ClimberSubsystem();
 
-    private final XboxController controller = new XboxController(0);
+    public static XboxController driveController = new XboxController(0);
+    public static XboxController mechController = new XboxController(1);
 
     public RobotContainer() {
         drivetrain.register();
+        elevator.register();
+        endEffector.register();
+        climber.register();
 
         drivetrain.setDefaultCommand(new DriveCommand(
                 drivetrain,
-                () -> -modifyAxis(controller.getLeftY()), // Axes are flipped here on purpose
-                () -> -modifyAxis(controller.getLeftX()),
-                () -> modifyAxis(controller.getRightX())
+                () -> -modifyAxis(driveController.getLeftY()), // Axes are flipped here on purpose
+                () -> -modifyAxis(driveController.getLeftX()),
+                () -> modifyAxis(driveController.getRightX())
         ));
 
-        new Trigger(controller::getAButton).onTrue(Commands.runOnce(() -> drivetrain.zeroGyroscope(), drivetrain));
+        climber.setDefaultCommand(new ClimberCommand(climber, modifyAxis(mechController.getLeftY())));
+
+        new Trigger(driveController::getAButton).onTrue(Commands.runOnce(() -> drivetrain.zeroGyroscope(), drivetrain));
+
+        new Trigger(mechController::getLeftBumper).onTrue(Commands.run(() -> endEffector.intakeIn(), endEffector)).onFalse(Commands.runOnce(() -> endEffector.intakeStop(), endEffector));
+        new Trigger(mechController::getXButton).onTrue(Commands.run(() -> endEffector.intakeOut(), endEffector)).onFalse(Commands.run(() -> endEffector.intakeStop(), endEffector));
+        new Trigger(mechController::getRightBumper).onTrue(Commands.runOnce(() -> endEffector.fire(), endEffector));
+
+        new Trigger(mechController::getAButton).onTrue(Commands.runOnce(() -> elevator.grab(), elevator));
+        new Trigger(mechController::getBButton).onTrue(Commands.runOnce(() -> elevator.shoot(), elevator));
+        new Trigger(mechController::getYButton).onTrue(Commands.runOnce(() -> elevator.amp(), elevator));
+
     }
 
     public DrivetrainSubsystem getDrivetrain() {
