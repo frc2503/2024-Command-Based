@@ -48,11 +48,12 @@ public class RobotContainer {
 
         new Trigger(mechController::getLeftBumper).onTrue(Commands.run(() -> endEffector.intakeIn(), endEffector)).onFalse(Commands.runOnce(() -> endEffector.intakeStop(), endEffector));
         new Trigger(mechController::getXButton).onTrue(Commands.run(() -> endEffector.intakeOut(), endEffector)).onFalse(Commands.run(() -> endEffector.intakeStop(), endEffector));
-        new Trigger(mechController::getRightBumper).onTrue(Commands.runOnce(() -> endEffector.fire(), endEffector));
+        new Trigger(mechController::getRightBumper).onTrue(Commands.run(() -> endEffector.fire(), endEffector)).onFalse(Commands.runOnce(() -> endEffector.rampDown(), endEffector));
 
         new Trigger(mechController::getAButton).onTrue(Commands.runOnce(() -> elevator.grab(), elevator));
         new Trigger(mechController::getBButton).onTrue(Commands.runOnce(() -> elevator.shoot(), elevator));
         new Trigger(mechController::getYButton).onTrue(Commands.runOnce(() -> elevator.amp(), elevator));
+        new Trigger(mechController::getStartButton).onTrue(Commands.run(() -> elevator.zeroPID(), elevator)).onFalse(Commands.runOnce(() -> elevator.stopElevator(), elevator));
 
     }
 

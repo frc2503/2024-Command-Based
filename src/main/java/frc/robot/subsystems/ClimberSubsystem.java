@@ -31,8 +31,6 @@ public class ClimberSubsystem extends SubsystemBase{
         // }else{
         //     climber.set(0);
         // }
-        System.out.println("Speed = " + speed);
-        System.out.println("Encoder = " + encoderPosition);
         climber.set(speed);
         encoderPosition = -encoder.getPosition();
     }
