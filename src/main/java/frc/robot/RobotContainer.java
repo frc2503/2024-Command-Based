@@ -10,6 +10,8 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
+import frc.robot.vision.AprilTagIds;
+import frc.robot.vision.AprilTagLock;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,17 +31,20 @@ public class RobotContainer {
     public static XboxController driveController = new XboxController(0);
     public static XboxController mechController = new XboxController(1);
 
+    private AprilTagLock aprilTagLock = new AprilTagLock();
+
     public RobotContainer() {
         drivetrain.register();
         elevator.register();
         endEffector.register();
         climber.register();
 
+
         drivetrain.setDefaultCommand(new DriveCommand(
                 drivetrain,
                 () -> -modifyAxis(driveController.getLeftY()), // Axes are flipped here on purpose
                 () -> -modifyAxis(driveController.getLeftX()),
-                () -> modifyAxis(driveController.getRightX())
+                () -> getDriveRotation()
         ));
 
         climber.setDefaultCommand(new ClimberCommand(climber, () -> modifyAxis(mechController.getLeftY())));
@@ -59,6 +64,21 @@ public class RobotContainer {
 
     public DrivetrainSubsystem getDrivetrain() {
         return drivetrain;
+    }
+
+    private double getDriveRotation() {
+        double controllerAngle = modifyAxis(driveController.getRightX());
+        if (driveController.getRightBumperPressed()) {
+            // Holding right bumper of drive controller will try to lock onto AprilTag above speaker
+            Double aprilTagAngle = aprilTagLock.getAngleToTag(AprilTagIds.getSpeakerTagId());
+            if (aprilTagAngle != null) {
+                return aprilTagAngle;
+            } else {
+                return controllerAngle;
+            }
+        } else {
+            return controllerAngle;
+        }
     }
 
     private static double deadband(double value, double deadband) {
