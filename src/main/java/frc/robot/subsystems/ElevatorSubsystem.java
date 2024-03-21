@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -15,23 +18,25 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final CANSparkMax elevator;
     private final SparkPIDController elevatorPID;
     private final RelativeEncoder encoder;
-    public static String elevatorSetpoint = "amp";
+    public static String elevatorSetpoint;
     private DigitalInput zeroSwitch;
+    private boolean isZeroedForAutonomous = false;
+    public ElevatorStates elevatorState = ElevatorStates.AMP;
     
     public ElevatorSubsystem(){
         elevator = new CANSparkMax(Constants.ELEVATOR, MotorType.kBrushless);
         elevatorPID = elevator.getPIDController();
         encoder = elevator.getEncoder();
 
-        zeroSwitch = new DigitalInput(1);
+        zeroSwitch = new DigitalInput(0);
 
-        encoder.setPositionConversionFactor(.0052338);
+        encoder.setPositionConversionFactor(.00392535);
 
         elevatorPID.setFeedbackDevice(encoder);
-        setPIDGains(0, 1, 0, 0);
+        setPIDGains(0, 5.5, 0, 0);
         elevatorPID.setOutputRange(-1, 1);
-        elevatorPID.setSmartMotionMaxVelocity(1, 0);
-        elevatorPID.setSmartMotionMaxAccel(.66, 0);
+        elevatorPID.setSmartMotionMaxVelocity(2.5, 0);
+        elevatorPID.setSmartMotionMaxAccel(1, 0);
     }
 
     public void setPIDGains(double FF, double P, double I, double D){
@@ -43,6 +48,21 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void periodic(){
+       // System.out.println(zeroSwitch.get());
+        //System.out.println("Elevator position: " + encoder.getPosition());
+        if(elevatorSetpoint == "grab" && encoder.getPosition() <= Units.inchesToMeters(0) && encoder.getPosition() >= -Units.inchesToMeters(.5)){
+            elevatorState = ElevatorStates.GRAB;
+        }else if(elevatorSetpoint == "shoot" && encoder.getPosition() <= -Units.inchesToMeters(28) && encoder.getPosition() >= -Units.inchesToMeters(29)){
+            elevatorState = ElevatorStates.SHOOT;
+        }else if(elevatorSetpoint == "amp" && encoder.getPosition() <= -Units.inchesToMeters(42.5) && encoder.getPosition() >= -Units.inchesToMeters(43.5)){
+            elevatorState = ElevatorStates.AMP;
+        }else {
+            elevatorState = ElevatorStates.MOVING;
+        }
+        
+    }
+
+    public void updateElevatorState() {
         
     }
 
@@ -52,27 +72,61 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public void shoot(){
-        elevatorPID.setReference(-Units.inchesToMeters(31.5), ControlType.kPosition);
+        elevatorPID.setReference(-Units.inchesToMeters(28.5), ControlType.kPosition);
         elevatorSetpoint = "shoot";
     }
 
+    // public void shootPlus(){
+    //     elevatorPID.setReference(27.5, ControlType.kPosition);
+    //     elevatorSetpoint = "shoot";
+    // }
+
     public void amp(){
-        elevatorPID.setReference(-Units.inchesToMeters(18.25*2+7), ControlType.kPosition);
+        elevatorPID.setReference(-Units.inchesToMeters(44), ControlType.kPosition);
         elevatorSetpoint = "amp";
     }
 
     public void zeroPID(){
         if(zeroSwitch.get() == true){
-            elevator.set(.3);
+            elevator.set(.5);
         }else{
+            isZeroedForAutonomous = true;
             elevator.set(0);
             encoder.setPosition(0);
+            elevatorSetpoint = "grab";
         }
         
     }
 
     public void stopElevator(){
         elevator.set(0);
+    }
+
+    public void manualElevatorControl(DoubleSupplier speed){
+        elevator.set(speed.getAsDouble()*-.2);
+    }
+
+    public boolean isZeroedForAutonomous() {
+        return isZeroedForAutonomous;
+    }
+
+    public void setZeroedForAutonomous(boolean isZeroed) {
+        this.isZeroedForAutonomous = isZeroed;
+    }
+
+    public ElevatorStates getElevatorState() {
+        return elevatorState;
+    }
+
+    public void setElevatorState(ElevatorStates state) {
+        this.elevatorState = state;
+    }
+
+    public enum ElevatorStates{
+        AMP,
+        SHOOT,
+        GRAB,
+        MOVING
     }
 
 }
